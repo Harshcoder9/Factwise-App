@@ -13,4 +13,4 @@ Frontend prototype for quarantine care operations.
 
 ## Run locally
 
-Open `app.html` in a browser.
+Open `index.html` in a browser. Vercel serves it automatically at the root URL.
