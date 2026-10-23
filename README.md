@@ -1,4 +1,4 @@
-# Sehat Saathi 74
+# Sehat Saathi
 
 Frontend prototype for quarantine care operations.
 
