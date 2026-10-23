@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sehat Saathi 74 — Quarantine operations</title>
+  <style>
+    :root {
+      --ink: #17262d;
+      --muted: #6d7d82;
+      --line: #e6eceb;
+      --paper: #f7faf8;
+      --card: #ffffff;
+      --teal: #0e7c75;
+      --teal-dark: #075b58;
+      --mint: #dff4ec;
+      --orange: #f28c52;
+      --orange-soft: #fff0e6;
+      --yellow: #e4b448;
+      --yellow-soft: #fff7dc;
+      --red: #d95f59;
+      --red-soft: #ffebea;
+      --shadow: 0 18px 50px rgba(37, 73, 72, .08);
+      font-family: "Times New Roman", Times, serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-size: 14px; line-height: 1.25; overflow-x: hidden; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; border: 0; line-height: 1.15; }
+    .app { min-height: 100vh; display: flex; }
+    .sidebar { width: 252px; flex: 0 0 252px; background: #102e31; color: #d6e6e2; padding: 28px 18px; display: flex; flex-direction: column; }
+    .brand { width: 190px; height: 72px; margin: 0 10px 32px; overflow: hidden; }
+    .brand-image { width: 190px; height: 72px; object-fit: cover; object-position: center 24%; display: block; }
+    .nav-label { color: #6f9690; text-transform: uppercase; font-size: 10px; letter-spacing: 1.5px; font-weight: 800; margin: 0 12px 10px; }
+    .nav { display: grid; gap: 5px; }
+    .nav button { text-align: left; background: transparent; color: #a8c2be; padding: 12px; border-radius: 10px; display: flex; gap: 12px; align-items: center; font-size: 13px; font-weight: 600; }
+    .nav button:hover, .nav button.active { background: #1b4849; color: #fff; }
+    .nav-icon { width: 20px; text-align: center; opacity: .9; }
+    .sidebar-footer { margin-top: auto; background: #174042; border-radius: 14px; padding: 15px; }
+    .sidebar-footer p { margin: 0 0 7px; font-size: 12px; color: #9bc3bb; }
+    .capacity-mini { display: flex; justify-content: space-between; align-items: end; color: #fff; }
+    .capacity-mini strong { font-size: 25px; }
+    .capacity-bar { height: 5px; background: #3a6666; border-radius: 9px; margin-top: 10px; overflow: hidden; }
+    .capacity-bar span { display: block; width: 92%; height: 100%; background: var(--orange); }
+    .main { min-width: 0; flex: 1; overflow: hidden; }
+    .topbar { height: 80px; background: #fff; border-bottom: 1px solid var(--line); padding: 0 42px; display: flex; align-items: center; justify-content: space-between; }
+    .eyebrow { color: var(--teal); text-transform: uppercase; letter-spacing: 1.5px; font-size: 10px; font-weight: 800; }
+    .topbar h1 { margin: 3px 0 0; font-size: 19px; line-height: 1.1; letter-spacing: -.3px; }
+    .top-actions { display: flex; align-items: center; gap: 20px; }
+    .date { color: var(--muted); font-size: 13px; }
+    .icon-button { width: 35px; height: 35px; background: #f3f7f6; color: var(--teal-dark); border-radius: 10px; position: relative; }
+    .notification-dot { position: absolute; right: 7px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+    .profile { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; }
+    .profile { cursor: pointer; padding: 5px 8px 5px 5px; border-radius: 12px; transition: background-color .16s ease, transform .16s ease; }
+    .profile:hover { background: #f3f7f6; }
+    .profile:active { transform: scale(.98); }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: #d0ebe3; color: var(--teal-dark); display: grid; place-items: center; font-weight: 800; }
+    .content { padding: 34px 42px 50px; max-width: 1480px; margin: auto; overflow: hidden; }
+    .welcome { display: flex; justify-content: space-between; align-items: end; margin-bottom: 26px; }
+    .welcome h2 { margin: 5px 0 4px; font-size: 27px; line-height: 1.1; letter-spacing: -.6px; }
+    .welcome p { margin: 0; color: var(--muted); font-size: 14px; }
+    .primary { background: var(--teal); color: white; padding: 12px 17px; border-radius: 9px; font-weight: 700; box-shadow: 0 7px 16px rgba(14,124,117,.16); }
+    .primary:hover { background: var(--teal-dark); }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+    .stat-card, .panel { background: var(--card); border: 1px solid var(--line); border-radius: 15px; box-shadow: var(--shadow); }
+    .stat-card { padding: 20px; position: relative; overflow: hidden; }
+    .stat-card:after { content: ""; position: absolute; width: 70px; height: 70px; border-radius: 50%; right: -20px; top: -20px; background: var(--mint); opacity: .65; }
+    .stat-label { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .stat-number { font-size: 30px; font-weight: 800; margin: 7px 0 2px; letter-spacing: -1px; }
+    .stat-note { font-size: 11px; color: var(--teal); font-weight: 700; }
+    .stat-note.warn { color: var(--orange); }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(310px, .8fr); gap: 20px; }
+    .panel { padding: 22px; }
+    .panel + .panel { margin-top: 20px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .panel-title { font-size: 16px; line-height: 1.15; font-weight: 800; margin: 0; }
+    .panel-subtitle { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
+    .link-button { color: var(--teal); background: transparent; font-size: 12px; font-weight: 800; }
+    .queue { display: grid; gap: 11px; }
+    .queue-item { border: 1px solid var(--line); border-radius: 11px; padding: 13px; display: flex; align-items: center; gap: 13px; }
+    .queue-item:hover { border-color: #a5d5cd; background: #fbfffd; }
+    .queue-symbol { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--orange-soft); color: var(--orange); font-size: 18px; }
+    .queue-symbol.green { background: var(--mint); color: var(--teal); }
+    .queue-symbol.red { background: var(--red-soft); color: var(--red); }
+    .queue-copy { flex: 1; }
+    .queue-copy strong { font-size: 13px; display: block; }
+    .queue-copy span { color: var(--muted); font-size: 11px; display: block; margin-top: 3px; }
+    .queue-count { font-size: 21px; font-weight: 800; }
+    .patient-row { display: grid; grid-template-columns: 1.5fr 70px 130px 130px 85px 70px; gap: 12px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line); }
+    .patient-row.header { border: 0; padding-top: 0; color: #8a999b; font-size: 10px; text-transform: uppercase; letter-spacing: .8px; font-weight: 800; }
+    .patient-name { display: flex; gap: 10px; align-items: center; min-width: 0; }
+    .patient-name .avatar { width: 30px; height: 30px; font-size: 11px; flex: 0 0 30px; }
+    .patient-name strong { display: block; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .patient-name span, .cell-muted { color: var(--muted); font-size: 10px; display: block; margin-top: 2px; }
+    .status { border-radius: 30px; padding: 5px 8px; display: inline-block; font-size: 10px; font-weight: 800; white-space: nowrap; }
+    .status.green { background: var(--mint); color: var(--teal-dark); }
+    .status.yellow { background: var(--yellow-soft); color: #97700d; }
+    .status.red { background: var(--red-soft); color: #a73e38; }
+    .status.gray { background: #eff3f2; color: #657579; }
+    .text-action { color: var(--teal); background: transparent; font-size: 11px; font-weight: 800; }
+    .score-wrap { display: flex; align-items: center; gap: 9px; }
+    .score-ring { width: 104px; height: 104px; border-radius: 50%; background: conic-gradient(var(--teal) 0 87%, #e6f0ed 87%); display: grid; place-items: center; }
+    .score-ring:before { content: ""; position: absolute; width: 76px; height: 76px; background: white; border-radius: 50%; }
+    .score-ring strong { position: relative; font-size: 24px; }
+    .score-copy { flex: 1; }
+    .score-copy strong { display: block; font-size: 13px; }
+    .score-copy span { color: var(--muted); font-size: 11px; line-height: 1.5; display: block; margin-top: 6px; }
+    .metric { margin-top: 20px; }
+    .metric-line { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; margin-bottom: 7px; }
+    .metric-line span { color: var(--muted); font-weight: 600; }
+    .progress { height: 7px; background: #edf2f0; border-radius: 9px; overflow: hidden; }
+    .progress span { display: block; height: 100%; border-radius: 9px; background: var(--teal); }
+    .progress.orange span { background: var(--orange); }
+    .insight { display: flex; gap: 11px; border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
+    .insight-icon { width: 29px; height: 29px; border-radius: 9px; background: var(--yellow-soft); color: var(--yellow); display: grid; place-items: center; flex: 0 0 29px; }
+    .insight strong { font-size: 12px; display: block; }
+    .insight p { color: var(--muted); font-size: 11px; margin: 3px 0 0; line-height: 1.4; }
+    .toast { position: fixed; right: 24px; bottom: 24px; background: #153d3d; color: #fff; padding: 14px 18px; border-radius: 10px; box-shadow: var(--shadow); font-size: 13px; transform: translateY(150px); transition: transform .25s; z-index: 10; }
+    .toast.show { transform: translateY(0); }
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(16,46,49,.43); z-index: 5; padding: 30px; }
+    .modal-backdrop.open { display: grid; place-items: center; }
+    .modal { width: min(560px, 100%); background: white; border-radius: 17px; padding: 25px; box-shadow: 0 25px 70px rgba(0,0,0,.2); }
+    .modal-head { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
+    .modal h3 { margin: 0; font-size: 20px; }
+    .close { background: #f2f6f5; color: var(--muted); border-radius: 8px; width: 32px; height: 32px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .field { display: grid; gap: 6px; }
+    .field.full { grid-column: 1/-1; }
+    .field label { font-size: 11px; color: var(--muted); font-weight: 800; }
+    .field input, .field textarea, .field select { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 11px; color: var(--ink); outline: none; background: #fcfefd; }
+    .field textarea { min-height: 75px; resize: vertical; }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px #e1f2ed; }
+    .modal-foot { display: flex; justify-content: end; gap: 10px; margin-top: 22px; }
+    .secondary { background: #eef4f2; color: var(--teal-dark); padding: 11px 15px; border-radius: 9px; font-weight: 700; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .screen-intro { display: flex; justify-content: space-between; align-items: end; margin-bottom: 24px; }
+    .screen-intro h2 { margin: 5px 0; font-size: 25px; line-height: 1.1; letter-spacing: -.4px; }
+    .screen-intro p { color: var(--muted); margin: 0; font-size: 13px; }
+    .filter-row { display: flex; gap: 9px; flex-wrap: wrap; }
+    .filter { border: 1px solid var(--line); background: #fff; color: var(--muted); padding: 9px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+    .filter.active, .filter:hover { border-color: var(--teal); color: var(--teal); background: #f1fbf8; }
+    .task-card { display: flex; gap: 15px; align-items: center; padding: 16px 0; border-top: 1px solid var(--line); }
+    .task-card:first-child { border-top: 0; padding-top: 0; }
+    .task-card .queue-symbol { flex: 0 0 38px; }
+    .task-card-copy { flex: 1; }
+    .task-card-copy strong { display: block; font-size: 13px; }
+    .task-card-copy p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+    .room-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .room { border: 1px solid var(--line); padding: 13px 8px; border-radius: 10px; text-align: center; }
+    .room strong { display: block; font-size: 12px; }
+    .room small { color: var(--muted); font-size: 10px; display: block; margin-top: 4px; }
+    .room.occupied { background: #fff8f1; border-color: #f7d7be; }
+    .room.available { background: #f0faf6; border-color: #c9e8dc; }
+    .room.cleaning { background: #fffbed; border-color: #f1e2ac; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-top: 1px solid var(--line); }
+    .setting-row strong { font-size: 13px; display: block; }
+    .setting-row p { color: var(--muted); margin: 4px 0 0; font-size: 11px; }
+    .toggle { width: 38px; height: 22px; border-radius: 12px; background: var(--teal); padding: 3px; }
+    .toggle:after { content: ""; display: block; width: 16px; height: 16px; border-radius: 50%; background: #fff; margin-left: 16px; }
+    .filter-item { transition: opacity .22s ease, transform .22s ease, max-height .25s ease; }
+    .filter-item.is-hidden { display: none; }
+    .screen.active { animation: screen-enter .28s ease both; }
+    .panel, .stat-card { animation: card-enter .35s ease both; }
+    .queue-item, .task-card, .patient-row, .room { transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease; }
+    .queue-item:hover, .task-card:hover, .room:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 73, 72, .08); }
+    .primary, .secondary, .filter, .text-action, .icon-button, .close, .toggle { transition: transform .16s ease, background-color .16s ease, color .16s ease, box-shadow .16s ease; }
+    .primary:active, .secondary:active, .filter:active, .text-action:active, .icon-button:active, .close:active { transform: scale(.96); }
+    .modal-backdrop { opacity: 0; transition: opacity .2s ease; }
+    .modal-backdrop.open { opacity: 1; }
+    .modal-backdrop .modal { transform: translateY(12px) scale(.98); transition: transform .24s ease; }
+    .modal-backdrop.open .modal { transform: translateY(0) scale(1); }
+    .toast { transition: transform .25s ease, opacity .25s ease; opacity: 0; }
+    .toast.show { opacity: 1; }
+    @keyframes screen-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes card-enter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .mobile-menu { display: none; }
+    @media (max-width: 1120px) { .sidebar { width: 218px; flex-basis: 218px; } .topbar, .content { padding-left: 25px; padding-right: 25px; } .patient-row { grid-template-columns: minmax(135px, 1.5fr) 42px minmax(78px, .9fr) minmax(78px, .9fr) 58px 40px; gap: 5px; } .patient-row .patient-name { gap: 7px; } .patient-row .patient-name strong { font-size: 11px; } .patient-row .status { padding: 4px 6px; } }
+    @media (max-width: 950px) and (min-width: 851px) { .patient-row { grid-template-columns: minmax(135px, 1.5fr) 38px minmax(70px, .8fr) minmax(70px, .8fr) 52px 34px; gap: 4px; } .patient-row .cell-muted, .patient-row .patient-name span { font-size: 9px; } .patient-row .status { font-size: 9px; padding: 4px 5px; } .patient-row .text-action { font-size: 10px; } }
+    @media (max-width: 850px) { .sidebar { display: none; } .mobile-menu { display: inline-block; margin-right: 10px; } .topbar { padding: 0 18px; } .content { padding: 24px 18px 40px; } .stats { grid-template-columns: repeat(2, 1fr); } .layout { grid-template-columns: 1fr; } .date { display: none; } }
+    @media (max-width: 600px) { .welcome { align-items: start; gap: 15px; flex-direction: column; } .welcome h2 { font-size: 25px; } .patient-row { grid-template-columns: 1fr 70px 75px; } .patient-row > :nth-child(3), .patient-row > :nth-child(4), .patient-row > :nth-child(6) { display: none; } .form-grid { grid-template-columns: 1fr; } .field.full { grid-column: auto; } .topbar h1 { font-size: 17px; } .profile span { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><img class="brand-image" src="assets/sehat-saathi-brand-transparent.png" alt="Sehat Saathi — Care delivered right, every single day"></div>
+      <div class="nav-label">Workspace</div>
+      <nav class="nav">
+        <button class="active" data-view="overview"><span class="nav-icon">◈</span>Overview</button>
+        <button data-view="tasks"><span class="nav-icon">♙</span>My task queue <span class="status red" style="margin-left:auto;padding:3px 6px">8</span></button>
+        <button data-view="patients"><span class="nav-icon">▣</span>Patients</button>
+        <button data-view="discharge"><span class="nav-icon">◷</span>Discharge queue</button>
+        <button data-view="rooms"><span class="nav-icon">⌂</span>Rooms & capacity</button>
+      </nav>
+      <div class="nav-label" style="margin-top:30px">Insights</div>
+      <nav class="nav">
+        <button data-view="performance"><span class="nav-icon">⌁</span>Performance</button>
+        <button data-view="settings"><span class="nav-icon">⚙</span>Settings</button>
+      </nav>
+      <div class="sidebar-footer">
+        <p>Facility capacity</p>
+        <div class="capacity-mini"><strong>68 <small style="font-size:12px;color:#8db7af">/ 74</small></strong><span style="font-size:11px;color:#9bc3bb">92% full</span></div>
+        <div class="capacity-bar"><span></span></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><button class="icon-button mobile-menu">☰</button><div class="eyebrow">Thursday · 23 October 2026</div><h1>Facility overview</h1></div>
+        <div class="top-actions"><span class="date">Last synced 2 min ago</span><button class="icon-button">♧<i class="notification-dot"></i></button><button class="profile" id="profileButton" type="button"><div class="avatar" id="profileAvatar">AM</div><span id="profileName">Dr. Aisha Menon</span><span aria-hidden="true">⌄</span></button></div>
+      </header>
+      <section class="content screen active" id="overview">
+        <div class="welcome"><div><div class="eyebrow">Good morning, Aisha</div><h2>Keep every patient moving forward.</h2><p>Here is what needs your attention across the facility today.</p></div><button class="primary" id="recordBtn">＋ Record temperature</button></div>
+        <div class="stats">
+          <div class="stat-card"><div class="stat-label">Patients in care</div><div class="stat-number">68 <span style="font-size:14px;color:#9ba9a9;font-weight:600">/ 74</span></div><div class="stat-note">6 rooms available</div></div>
+          <div class="stat-card"><div class="stat-label">Care completed today</div><div class="stat-number">87%</div><div class="stat-note">↑ 6% from yesterday</div></div>
+          <div class="stat-card"><div class="stat-label">Needs attention</div><div class="stat-number">8</div><div class="stat-note warn">2 high priority</div></div>
+          <div class="stat-card"><div class="stat-label">Ready to discharge</div><div class="stat-number">4</div><div class="stat-note">Potential capacity +4</div></div>
+        </div>
+        <div class="layout">
+          <div>
+            <div class="panel">
+              <div class="panel-head"><div><h3 class="panel-title">Next best actions</h3><p class="panel-subtitle">Exception-first task queue for your team</p></div><button class="link-button">View all →</button></div>
+              <div class="queue">
+                <div class="queue-item"><div class="queue-symbol red">!</div><div class="queue-copy"><strong>2 patients need immediate review</strong><span>Rising temperature trend · Rooms 23 and 41</span></div><div class="queue-count">2</div><button class="text-action">Open</button></div>
+                <div class="queue-item"><div class="queue-symbol">◷</div><div class="queue-copy"><strong>6 temperature checks remaining</strong><span>Keep daily care coverage at 100%</span></div><div class="queue-count">6</div><button class="text-action" id="queueRecord">Start</button></div>
+                <div class="queue-item"><div class="queue-symbol green">✓</div><div class="queue-copy"><strong>4 patients are ready for discharge</strong><span>Three full fever-free days completed</span></div><div class="queue-count">4</div><button class="text-action" data-go="discharge">Review</button></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><div><h3 class="panel-title">Patients needing attention</h3><p class="panel-subtitle">Prioritized by operational risk, not just medical status</p></div><button class="link-button">All patients →</button></div>
+              <div class="patient-row header"><div>Patient</div><div>Room</div><div>Today's temp</div><div>Doctor visit</div><div>Risk</div><div></div></div>
+              <div class="patient-row"><div class="patient-name"><div class="avatar" style="background:#ffe3d0;color:#a7582e">AM</div><div><strong>Arjun Mehta</strong><span>Admitted 3 days ago</span></div></div><div class="cell-muted">23</div><div><strong style="font-size:12px">38.6°C</strong><span class="cell-muted">↑ rising</span></div><div><span class="status red">Pending</span></div><div><span class="status red">High</span></div><button class="text-action patient-action" data-name="Arjun Mehta">View</button></div>
+              <div class="patient-row"><div class="patient-name"><div class="avatar" style="background:#ffe3d0;color:#a7582e">RS</div><div><strong>Rohan Sharma</strong><span>Admitted 5 days ago</span></div></div><div class="cell-muted">41</div><div><strong style="font-size:12px">37.9°C</strong><span class="cell-muted">↑ 0.8°C</span></div><div><span class="status red">Pending</span></div><div><span class="status red">High</span></div><button class="text-action patient-action" data-name="Rohan Sharma">View</button></div>
+              <div class="patient-row"><div class="patient-name"><div class="avatar">PN</div><div><strong>Priya Nair</strong><span>Admitted yesterday</span></div></div><div class="cell-muted">18</div><div><span class="status yellow">Not recorded</span></div><div><span class="status yellow">Pending</span></div><div><span class="status yellow">Watch</span></div><button class="text-action patient-action" data-name="Priya Nair">View</button></div>
+              <div class="patient-row"><div class="patient-name"><div class="avatar">AV</div><div><strong>Amit Verma</strong><span>Admitted 6 days ago</span></div></div><div class="cell-muted">12</div><div><strong style="font-size:12px">36.7°C</strong><span class="cell-muted">3 days fever-free</span></div><div><span class="status green">Complete</span></div><div><span class="status green">Low</span></div><button class="text-action patient-action" data-name="Amit Verma">View</button></div>
+            </div>
+          </div>
+          <div>
+            <div class="panel">
+              <div class="panel-head"><div><h3 class="panel-title">Daily care score</h3><p class="panel-subtitle">Are we completing the basics?</p></div><span class="status green">On track</span></div>
+              <div class="score-wrap"><div class="score-ring"><strong>87%</strong></div><div class="score-copy"><strong>Strong coverage today</strong><span>Target is 95%. Closing the remaining 8 tasks recovers 6 points.</span></div></div>
+              <div class="metric"><div class="metric-line"><span>Temperature coverage</span>94%</div><div class="progress"><span style="width:94%"></span></div></div>
+              <div class="metric"><div class="metric-line"><span>Doctor visit completion</span>76%</div><div class="progress orange"><span style="width:76%"></span></div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><div><h3 class="panel-title">Capacity recovery</h3><p class="panel-subtitle">Rooms we can safely make available</p></div><button class="link-button">Details →</button></div>
+              <div style="display:flex;align-items:baseline;gap:8px"><strong style="font-size:36px;letter-spacing:-1px">4</strong><span style="color:var(--muted);font-size:12px">potential rooms today</span></div>
+              <div class="insight"><div class="insight-icon">✓</div><div><strong>3 are medically ready</strong><p>Waiting for discharge confirmation from admin.</p></div></div>
+              <div class="insight"><div class="insight-icon" style="background:var(--orange-soft);color:var(--orange)">◷</div><div><strong>1 is awaiting review</strong><p>Amit Verma completed 3 fever-free days.</p></div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><div><h3 class="panel-title">Quality benchmark</h3><p class="panel-subtitle">Rolling facility outcome</p></div><span class="status green">On target</span></div>
+              <div style="display:flex;justify-content:space-between;margin:4px 0 17px"><div><div style="font-size:11px;color:var(--muted)">Success rate</div><strong style="font-size:24px">86.4%</strong></div><div style="text-align:right"><div style="font-size:11px;color:var(--muted)">Mortality</div><strong style="font-size:24px;color:var(--teal)">13.6%</strong></div></div>
+              <div class="progress"><span style="width:86.4%"></span></div><p style="margin:8px 0 0;font-size:10px;color:var(--muted)">Benchmark: 85% success · 15% mortality</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="content screen" id="tasks">
+        <div class="screen-intro"><div><div class="eyebrow">My task queue</div><h2>Make every handover count.</h2><p>Eight actions are still open for today's care cycle.</p></div><button class="primary" id="taskRecordBtn">＋ Record temperature</button></div>
+        <div class="stats"><div class="stat-card"><div class="stat-label">Open tasks</div><div class="stat-number">8</div><div class="stat-note warn">2 high priority</div></div><div class="stat-card"><div class="stat-label">Completed today</div><div class="stat-number">52</div><div class="stat-note">↑ 6 from yesterday</div></div><div class="stat-card"><div class="stat-label">Temperature checks</div><div class="stat-number">6</div><div class="stat-note warn">Still pending</div></div><div class="stat-card"><div class="stat-label">Doctor visits</div><div class="stat-number">2</div><div class="stat-note">Awaiting rounds</div></div></div>
+        <div class="panel"><div class="panel-head"><div><h3 class="panel-title">Prioritized worklist</h3><p class="panel-subtitle">Complete urgent work first, then close the daily care gaps.</p></div><div class="filter-row"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="high">High priority</button><button class="filter" data-filter="shift">My shift</button></div></div>
+          <div class="task-card filter-item" data-filter-group="high shift"><div class="queue-symbol red">!</div><div class="task-card-copy"><strong>Review Arjun Mehta · Room 23</strong><p>Temperature is 38.6°C and rising. Doctor visit is pending.</p></div><span class="status red">High</span><button class="text-action task-done">Acknowledge</button></div>
+          <div class="task-card filter-item" data-filter-group="high"><div class="queue-symbol red">!</div><div class="task-card-copy"><strong>Review Rohan Sharma · Room 41</strong><p>Temperature increased by 0.8°C since yesterday.</p></div><span class="status red">High</span><button class="text-action task-done">Acknowledge</button></div>
+          <div class="task-card filter-item" data-filter-group="shift"><div class="queue-symbol">◷</div><div class="task-card-copy"><strong>Record daily temperatures</strong><p>Priya Nair and five more patients have no reading today.</p></div><span class="status yellow">6 left</span><button class="text-action" id="taskRecordBtn2">Start</button></div>
+          <div class="task-card filter-item" data-filter-group="shift"><div class="queue-symbol green">✓</div><div class="task-card-copy"><strong>Confirm discharge review</strong><p>Amit Verma has completed three full fever-free days.</p></div><span class="status green">Ready</span><button class="text-action" data-go="discharge">Review</button></div>
+        </div>
+      </section>
+      <section class="content screen" id="patients">
+        <div class="screen-intro"><div><div class="eyebrow">Patient register</div><h2>Every patient, one clear timeline.</h2><p>Search and filter the active care list.</p></div><button class="primary" id="patientRecordBtn">＋ Record temperature</button></div>
+        <div class="panel"><div class="panel-head"><div class="filter-row"><button class="filter active" data-filter="all">All patients · 68</button><button class="filter" data-filter="attention">Needs attention · 8</button><button class="filter" data-filter="stable">Stable · 60</button></div><button class="link-button">Export list ↓</button></div>
+          <div class="patient-row header"><div>Patient</div><div>Room</div><div>Today's temp</div><div>Doctor visit</div><div>Risk</div><div></div></div>
+          <div class="patient-row filter-item" data-filter-group="attention"><div class="patient-name"><div class="avatar" style="background:#ffe3d0;color:#a7582e">AM</div><div><strong>Arjun Mehta</strong><span>Admitted 3 days ago</span></div></div><div class="cell-muted">23</div><div>38.6°C<span class="cell-muted">↑ rising</span></div><div><span class="status red">Pending</span></div><div><span class="status red">High</span></div><button class="text-action patient-action" data-name="Arjun Mehta">View</button></div>
+          <div class="patient-row filter-item" data-filter-group="attention"><div class="patient-name"><div class="avatar">PN</div><div><strong>Priya Nair</strong><span>Admitted yesterday</span></div></div><div class="cell-muted">18</div><div><span class="status yellow">Not recorded</span></div><div><span class="status yellow">Pending</span></div><div><span class="status yellow">Watch</span></div><button class="text-action patient-action" data-name="Priya Nair">View</button></div>
+          <div class="patient-row filter-item" data-filter-group="stable"><div class="patient-name"><div class="avatar">AV</div><div><strong>Amit Verma</strong><span>Admitted 6 days ago</span></div></div><div class="cell-muted">12</div><div>36.7°C<span class="cell-muted">3 days fever-free</span></div><div><span class="status green">Complete</span></div><div><span class="status green">Low</span></div><button class="text-action patient-action" data-name="Amit Verma">View</button></div>
+        </div>
+      </section>
+      <section class="content screen" id="discharge">
+        <div class="screen-intro"><div><div class="eyebrow">Discharge queue</div><h2>Recover capacity, safely.</h2><p>Patients who meet the three-day fever-free rule need a timely decision.</p></div></div>
+        <div class="stats"><div class="stat-card"><div class="stat-label">Ready for review</div><div class="stat-number">4</div><div class="stat-note">3 medically ready</div></div><div class="stat-card"><div class="stat-label">Admin confirmation</div><div class="stat-number">3</div><div class="stat-note warn">Action required</div></div><div class="stat-card"><div class="stat-label">Rooms recoverable</div><div class="stat-number">4</div><div class="stat-note">Potential capacity</div></div><div class="stat-card"><div class="stat-label">Average stay</div><div class="stat-number">5.8d</div><div class="stat-note">↓ 0.6d this week</div></div></div>
+        <div class="panel"><div class="panel-head"><div><h3 class="panel-title">Patients eligible for discharge</h3><p class="panel-subtitle">No patient should stay longer because a handover was missed.</p></div></div>
+          <div class="task-card"><div class="queue-symbol green">✓</div><div class="task-card-copy"><strong>Amit Verma · Room 12</strong><p>3 fever-free days · Doctor recommendation complete</p></div><span class="status yellow">Admin review</span><button class="text-action discharge-done" data-patient="Amit Verma" data-room="12" data-days="3">Review</button></div>
+          <div class="task-card"><div class="queue-symbol green">✓</div><div class="task-card-copy"><strong>Neha Kulkarni · Room 07</strong><p>4 fever-free days · Doctor recommendation complete</p></div><span class="status yellow">Admin review</span><button class="text-action discharge-done" data-patient="Neha Kulkarni" data-room="07" data-days="4">Review</button></div>
+          <div class="task-card"><div class="queue-symbol">◷</div><div class="task-card-copy"><strong>Vikram Singh · Room 34</strong><p>3 fever-free days · Awaiting doctor recommendation</p></div><span class="status gray">Blocked</span><button class="text-action">Nudge doctor</button></div>
+        </div>
+      </section>
+      <section class="content screen" id="rooms">
+        <div class="screen-intro"><div><div class="eyebrow">Rooms & capacity</div><h2>Know where the next patient can go.</h2><p>Live occupancy across all 74 rooms.</p></div><button class="primary" id="admitBtn">＋ Admit patient</button></div>
+        <div class="stats"><div class="stat-card"><div class="stat-label">Occupied</div><div class="stat-number">68</div><div class="stat-note warn">92% full</div></div><div class="stat-card"><div class="stat-label">Available</div><div class="stat-number">4</div><div class="stat-note">Ready now</div></div><div class="stat-card"><div class="stat-label">Cleaning</div><div class="stat-number">2</div><div class="stat-note">Expected today</div></div><div class="stat-card"><div class="stat-label">Blocked</div><div class="stat-number">0</div><div class="stat-note">No maintenance issues</div></div></div>
+        <div class="panel"><div class="panel-head"><div><h3 class="panel-title">Room map</h3><p class="panel-subtitle">Select a room to see its current patient or availability.</p></div><div class="filter-row"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="available">Available</button><button class="filter" data-filter="occupied">Occupied</button></div></div><div class="room-grid"><div class="room filter-item occupied" data-filter-group="occupied"><strong>01</strong><small>Occupied</small></div><div class="room filter-item available" data-filter-group="available"><strong>02</strong><small>Available</small></div><div class="room filter-item occupied" data-filter-group="occupied"><strong>03</strong><small>Occupied</small></div><div class="room filter-item cleaning" data-filter-group="available"><strong>04</strong><small>Cleaning</small></div><div class="room filter-item occupied" data-filter-group="occupied"><strong>05</strong><small>Occupied</small></div><div class="room filter-item occupied" data-filter-group="occupied"><strong>06</strong><small>Occupied</small></div><div class="room filter-item occupied" data-filter-group="occupied"><strong>07</strong><small>Neha K.</small></div><div class="room filter-item occupied" data-filter-group="occupied"><strong>08</strong><small>Occupied</small></div><div class="room filter-item available" data-filter-group="available"><strong>09</strong><small>Available</small></div><div class="room filter-item occupied" data-filter-group="occupied"><strong>10</strong><small>Occupied</small></div><div class="room filter-item occupied" data-filter-group="occupied"><strong>11</strong><small>Occupied</small></div><div class="room filter-item occupied" data-filter-group="occupied"><strong>12</strong><small>Amit V.</small></div></div></div>
+      </section>
+      <section class="content screen" id="performance">
+        <div class="screen-intro"><div><div class="eyebrow">Facility performance</div><h2>Measure care, not just outcomes.</h2><p>Track the leading indicators that protect the 85% success benchmark.</p></div><button class="secondary" id="exportBtn">Export report ↓</button></div>
+        <div class="stats"><div class="stat-card"><div class="stat-label">Success rate</div><div class="stat-number">86.4%</div><div class="stat-note">↑ 1.4% above target</div></div><div class="stat-card"><div class="stat-label">Mortality rate</div><div class="stat-number">13.6%</div><div class="stat-note">↓ 1.4% below benchmark</div></div><div class="stat-card"><div class="stat-label">Temperature coverage</div><div class="stat-number">94%</div><div class="stat-note">Target: 95%</div></div><div class="stat-card"><div class="stat-label">Average length of stay</div><div class="stat-number">5.8d</div><div class="stat-note">↓ 0.6 days</div></div></div>
+        <div class="layout"><div class="panel"><div class="panel-head"><div><h3 class="panel-title">Care completion trend</h3><p class="panel-subtitle">Percentage of required daily actions completed</p></div><span class="status green">Improving</span></div><div class="metric"><div class="metric-line"><span>Temperature records</span>94%</div><div class="progress"><span style="width:94%"></span></div></div><div class="metric"><div class="metric-line"><span>Doctor consultations</span>76%</div><div class="progress orange"><span style="width:76%"></span></div></div><div class="metric"><div class="metric-line"><span>Timely discharge</span>82%</div><div class="progress"><span style="width:82%"></span></div></div></div><div class="panel"><div class="panel-head"><div><h3 class="panel-title">Benchmark status</h3><p class="panel-subtitle">No escalation required today</p></div><span class="status green">On target</span></div><div class="score-wrap"><div class="score-ring"><strong>86%</strong></div><div class="score-copy"><strong>Success rate is healthy</strong><span>Keep daily care completion above 95% to protect outcomes.</span></div></div></div></div>
+      </section>
+      <section class="content screen" id="settings">
+        <div class="screen-intro"><div><div class="eyebrow">Workspace settings</div><h2>Set up Sehat Saathi your way.</h2><p>Manage alerts and facility preferences.</p></div></div>
+        <div class="panel"><div class="panel-head"><div><h3 class="panel-title">Notifications & alerts</h3><p class="panel-subtitle">Choose which events should reach the care team.</p></div></div><div class="setting-row"><div><strong>High-risk patient alerts</strong><p>Notify the doctor when a temperature is rising.</p></div><button class="toggle setting-toggle"></button></div><div class="setting-row"><div><strong>Missed daily care reminders</strong><p>Send reminders before the shift closes.</p></div><button class="toggle setting-toggle"></button></div><div class="setting-row"><div><strong>Discharge readiness alerts</strong><p>Notify admin when three fever-free days are complete.</p></div><button class="toggle setting-toggle"></button></div></div>
+        <div class="panel"><div class="panel-head"><div><h3 class="panel-title">Facility rules</h3><p class="panel-subtitle">These rules drive the operational indicators.</p></div></div><div class="setting-row"><div><strong>Fever-free discharge threshold</strong><p>Patients need complete days without fever before discharge.</p></div><strong style="color:var(--teal)">3 days</strong></div><div class="setting-row"><div><strong>Facility capacity</strong><p>Maximum active patients in this centre.</p></div><strong style="color:var(--teal)">74 rooms</strong></div></div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="modal-backdrop" id="detailBackdrop">
+    <div class="modal">
+      <div class="modal-head"><div><div class="eyebrow" id="detailEyebrow">Patient timeline</div><h3 id="detailTitle">Patient details</h3></div><button class="close" id="closeDetail">×</button></div>
+      <div id="detailBody"></div>
+      <div class="modal-foot"><button type="button" class="secondary" id="closeDetailButton">Close</button><button type="button" class="primary" id="detailAction">Complete action</button></div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="profileBackdrop">
+    <div class="modal">
+      <div class="modal-head"><div><div class="eyebrow">Account profile</div><h3>Edit your profile</h3></div><button class="close" id="closeProfile" type="button">×</button></div>
+      <form id="profileForm">
+        <div class="form-grid">
+          <div class="field full"><label for="profileFullName">FULL NAME</label><input id="profileFullName" type="text" value="Dr. Aisha Menon" required></div>
+          <div class="field"><label for="profileRole">ROLE</label><select id="profileRole"><option>Head Doctor</option><option>Doctor</option><option>Nurse</option><option>Administrator</option><option>Facility Manager</option></select></div>
+          <div class="field"><label for="profileInitials">INITIALS</label><input id="profileInitials" type="text" value="AM" maxlength="3" required></div>
+        </div>
+        <div class="modal-foot"><button type="button" class="secondary" id="cancelProfile">Cancel</button><button type="submit" class="primary">Save profile</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-head"><div><div class="eyebrow">Daily care record</div><h3>Record a temperature</h3></div><button class="close" id="closeModal">×</button></div>
+      <form id="temperatureForm">
+        <div class="form-grid">
+          <div class="field"><label for="patient">PATIENT</label><select id="patient"><option>Priya Nair · Room 18</option><option>Arjun Mehta · Room 23</option><option>Rohan Sharma · Room 41</option><option>Amit Verma · Room 12</option></select></div>
+          <div class="field"><label for="temperature">TEMPERATURE (°C)</label><input id="temperature" type="number" step="0.1" min="30" max="45" placeholder="e.g. 36.8" required></div>
+          <div class="field full"><label for="symptoms">SYMPTOMS OR HANDOVER NOTE</label><textarea id="symptoms" placeholder="Add anything the next team should know..."></textarea></div>
+        </div>
+        <div class="modal-foot"><button type="button" class="secondary" id="cancelModal">Cancel</button><button type="submit" class="primary">Save temperature</button></div>
+      </form>
+    </div>
+  </div>
+  <script>
+    const backdrop = document.getElementById('modalBackdrop');
+    const detailBackdrop = document.getElementById('detailBackdrop');
+    const profileBackdrop = document.getElementById('profileBackdrop');
+    const toast = document.getElementById('toast');
+    const openModal = () => backdrop.classList.add('open');
+    const closeModal = () => backdrop.classList.remove('open');
+    const closeDetail = () => detailBackdrop.classList.remove('open');
+    const closeProfile = () => profileBackdrop.classList.remove('open');
+    const showToast = (message) => {
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 3200);
+    };
+    document.getElementById('recordBtn').addEventListener('click', openModal);
+    document.getElementById('queueRecord').addEventListener('click', openModal);
+    ['taskRecordBtn', 'taskRecordBtn2', 'patientRecordBtn'].forEach((id) => {
+      const button = document.getElementById(id);
+      if (button) button.addEventListener('click', openModal);
+    });
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelModal').addEventListener('click', closeModal);
+    document.getElementById('closeDetail').addEventListener('click', closeDetail);
+    document.getElementById('closeDetailButton').addEventListener('click', closeDetail);
+    document.getElementById('profileButton').addEventListener('click', () => {
+      document.getElementById('profileBackdrop').classList.add('open');
+    });
+    document.getElementById('closeProfile').addEventListener('click', closeProfile);
+    document.getElementById('cancelProfile').addEventListener('click', closeProfile);
+    backdrop.addEventListener('click', (event) => { if (event.target === backdrop) closeModal(); });
+    detailBackdrop.addEventListener('click', (event) => { if (event.target === detailBackdrop) closeDetail(); });
+    profileBackdrop.addEventListener('click', (event) => { if (event.target === profileBackdrop) closeProfile(); });
+    document.getElementById('temperatureForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const patient = document.getElementById('patient').value.split(' · ')[0];
+      const temperature = document.getElementById('temperature').value;
+      closeModal();
+      event.target.reset();
+      showToast(`Temperature ${temperature}°C recorded for ${patient}. Care queue updated.`);
+    });
+    document.getElementById('profileForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('profileFullName').value.trim();
+      const initials = document.getElementById('profileInitials').value.trim().toUpperCase();
+      const role = document.getElementById('profileRole').value;
+      if (!name || !initials) return;
+      document.getElementById('profileName').textContent = name;
+      document.getElementById('profileAvatar').textContent = initials;
+      document.querySelector('.welcome .eyebrow').textContent = `Good morning, ${name.replace(/^Dr\.\s*/i, '').split(' ')[0]}`;
+      closeProfile();
+      showToast(`Profile updated. Role: ${role}.`);
+    });
+    const openPatientTimeline = (name) => {
+      document.getElementById('detailEyebrow').textContent = 'Patient timeline';
+      document.getElementById('detailTitle').textContent = name;
+      document.getElementById('detailBody').innerHTML = `
+        <div class="metric-line"><span>Current care status</span><span class="status yellow">Doctor visit pending</span></div>
+        <div class="metric"><div class="metric-line"><span>Today's temperature</span><strong>${name === 'Arjun Mehta' ? '38.6°C · rising' : name === 'Priya Nair' ? 'Not recorded' : '36.7°C · stable'}</strong></div><div class="progress"><span style="width:${name === 'Amit Verma' ? '100' : '50'}%"></span></div></div>
+        <div class="panel" style="box-shadow:none;padding:15px;margin-top:17px;background:#f8fbfa">
+          <div class="panel-head" style="margin-bottom:10px"><div><h3 class="panel-title" style="font-size:13px">Care journey</h3><p class="panel-subtitle">Daily actions and decisions</p></div></div>
+          <div class="insight" style="margin-top:0;padding-top:0;border-top:0"><div class="insight-icon">✓</div><div><strong>Temperature history</strong><p>21 Oct · 37.4°C &nbsp; 22 Oct · 37.8°C &nbsp; 23 Oct · ${name === 'Priya Nair' ? 'Pending' : name === 'Amit Verma' ? '36.7°C' : '38.6°C'}</p></div></div>
+          <div class="insight"><div class="insight-icon" style="background:var(--orange-soft);color:var(--orange)">◷</div><div><strong>Doctor consultation</strong><p>Today's visit is still pending. Complete it after reviewing the latest reading.</p></div></div>
+          <div class="insight"><div class="insight-icon" style="background:var(--mint);color:var(--teal)">→</div><div><strong>Next best action</strong><p>${name === 'Priya Nair' ? 'Ask the nurse to record today’s temperature.' : 'Doctor should review the latest reading today.'}</p></div></div>
+        </div>`;
+      document.getElementById('detailAction').textContent = name === 'Priya Nair' ? 'Record temperature' : 'Complete doctor visit';
+      document.getElementById('detailAction').onclick = () => {
+        closeDetail();
+        if (name === 'Priya Nair') openModal();
+        else showToast(`Doctor visit for ${name} marked as completed.`);
+      };
+      detailBackdrop.classList.add('open');
+    };
+    document.querySelectorAll('.patient-action').forEach((button) => {
+      button.addEventListener('click', () => openPatientTimeline(button.dataset.name));
+    });
+    const switchView = (view) => {
+      document.querySelectorAll('.screen').forEach((screen) => screen.classList.toggle('active', screen.id === view));
+      const activeButton = document.querySelector(`.nav button[data-view="${view}"]`);
+      document.querySelectorAll('.nav button').forEach((item) => item.classList.toggle('active', item === activeButton));
+      const titles = { overview: 'Facility overview', tasks: 'My task queue', patients: 'Patient register', discharge: 'Discharge queue', rooms: 'Rooms & capacity', performance: 'Facility performance', settings: 'Workspace settings' };
+      document.querySelector('.topbar h1').textContent = titles[view] || 'Facility overview';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    document.querySelectorAll('.nav button').forEach((button) => {
+      button.addEventListener('click', () => {
+        switchView(button.dataset.view || 'overview');
+      });
+    });
+    document.querySelectorAll('[data-go]').forEach((button) => {
+      button.addEventListener('click', () => switchView(button.dataset.go));
+    });
+    document.querySelectorAll('.task-done').forEach((button) => {
+      button.addEventListener('click', () => {
+        button.textContent = 'Done';
+        button.className = 'status green';
+        showToast('Task acknowledged and removed from the urgent queue.');
+      });
+    });
+    document.querySelectorAll('.discharge-done').forEach((button) => {
+      button.addEventListener('click', () => {
+        const patient = button.dataset.patient;
+        document.getElementById('detailEyebrow').textContent = 'Discharge review';
+        document.getElementById('detailTitle').textContent = `${patient} · Room ${button.dataset.room}`;
+        document.getElementById('detailBody').innerHTML = `
+          <div class="insight" style="margin-top:0;padding-top:0;border-top:0"><div class="insight-icon">✓</div><div><strong>Eligibility confirmed</strong><p>${button.dataset.days} complete fever-free days recorded. Doctor recommendation is complete.</p></div></div>
+          <div class="panel" style="box-shadow:none;padding:15px;margin-top:17px;background:#f8fbfa">
+            <div class="metric-line"><span>Discharge decision</span><span class="status green">Ready for admin confirmation</span></div>
+            <div class="metric-line" style="margin-top:17px"><span>Impact</span><strong>Room ${button.dataset.room} becomes available</strong></div>
+            <p style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:0">Confirming this review updates the patient status to discharged and moves the room into the available capacity count.</p>
+          </div>`;
+        document.getElementById('detailAction').textContent = 'Confirm discharge';
+        document.getElementById('detailAction').onclick = () => {
+          closeDetail();
+          button.textContent = 'Confirmed';
+          button.className = 'status green';
+          showToast(`Discharge confirmed for ${patient}. Room ${button.dataset.room} is now recoverable.`);
+        };
+        detailBackdrop.classList.add('open');
+      });
+    });
+    document.querySelectorAll('.filter').forEach((button) => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        if (!filter) return;
+        const filterRow = button.parentElement;
+        filterRow.querySelectorAll('.filter').forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        const panel = button.closest('.panel');
+        if (!panel) return;
+        panel.querySelectorAll('.filter-item').forEach((item) => {
+          const visible = filter === 'all' || item.dataset.filterGroup.split(' ').includes(filter);
+          item.classList.toggle('is-hidden', !visible);
+        });
+        showToast(`${button.textContent.trim()} filter applied.`);
+      });
+    });
+    document.querySelectorAll('.setting-toggle').forEach((button) => {
+      button.addEventListener('click', () => {
+        button.classList.toggle('off');
+        button.style.background = button.classList.contains('off') ? '#b9c7c4' : 'var(--teal)';
+        button.querySelector('after');
+        showToast(`Notification preference ${button.classList.contains('off') ? 'disabled' : 'enabled'}.`);
+      });
+    });
+    document.getElementById('admitBtn').addEventListener('click', () => showToast('Admission workflow opened. Select an available room to continue.'));
+    document.getElementById('exportBtn').addEventListener('click', () => showToast('Performance report prepared for download.'));
+  </script>
+</body>
+</html>
